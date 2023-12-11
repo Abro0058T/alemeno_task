@@ -11,9 +11,9 @@ router.post('/create-loan',create_loan)
 
 router.get('/view-loan/:loan_id',view_loan)
 
-router.patch('/make-payment/customer_id/loan_id',make_payment)
+router.patch('/make-payment/:customer_id/:loan_id',make_payment)
 
-router.get('/view-statement/customer_id/loan_id',view_statement)
+router.get('/view-statement/:customer_id/:loan_id',view_statement)
 
 
 module.exports=router;
