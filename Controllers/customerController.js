@@ -65,7 +65,7 @@ exports.check_eligibility = (req, res) => {
                         monthly_installement: loan_amount * (1 + 14 / 100) / tenure
                     })
                 }
-                else if (create_loan > 10 && this.create_loan < 30 && interest_rate > 16) {
+                else if (credit_score > 10 && this.credit_score < 30 && interest_rate > 16) {
                     res.status(200).json({
                         customer_id,
                         "approval": true,
@@ -78,8 +78,11 @@ exports.check_eligibility = (req, res) => {
                 else if (credit_score < 10) {
                     res.status(200).send("loan not approved")
                 }
-                else if (sum_emi > (0.5 * monthly_salary)) {
+                else if (results[0].monthly_payment > (0.5 * results[0].monthly_salary)) {
                     res.status(200).send("loan not approved");
+                }
+                else{
+                    res.status(200).send("loan not approved")
                 }
             }
         }
