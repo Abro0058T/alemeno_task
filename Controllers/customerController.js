@@ -34,6 +34,9 @@ exports.check_eligibility = (req, res) => {
     const { customer_id, loan_amount, interest_rate, tenure } = req.body;
     connection.query(`select SUM(if(str_to_date(loan.end_date,'%d/%m/%Y')<=CURDATE(),1,0)) as past_loan ,Count(*) as no_loan ,SUM(if(YEAR(str_to_date(loan.start_date,'%d/%m/%Y'))=YEAR(CURDATE()),1,0)) as loan_activity,SUM(loan.loan_amount) as loan_volume ,SUM(loan.monthly_payment) as monthly_payment, loan.customer_id,customer.monthly_salary from loan_data as loan, customer_data as customer where loan.customer_id='${customer_id}'and customer.customer_id='${customer_id}';
     `, (error, results) => {
+        if(results[0].monthly_payment > (0.5 * results[0].monthly_salary)){
+            res.status(200).send("Loan not approved")
+        }
         if (error) {
             console.log(error);
             res.status(500).json({ error: error });
@@ -77,9 +80,6 @@ exports.check_eligibility = (req, res) => {
                 }
                 else if (credit_score < 10) {
                     res.status(200).send("loan not approved")
-                }
-                else if (results[0].monthly_payment > (0.5 * results[0].monthly_salary)) {
-                    res.status(200).send("loan not approved");
                 }
                 else{
                     res.status(200).send("loan not approved")
@@ -170,7 +170,7 @@ exports.make_payment = (req, res) => {
 }
 exports.view_statement = (req, res) => {
     const { customer_id, loan_id } = req.params;
-    connection.query(`select customer_id,loan_id,loan_amount*intrest_rate as principle,intrest_rate,monthly_payment*emi_on_time as amount_paid,monthly_payment,tenure-emi_on_time,emi_on_time from loan_data where customer_id='${customer_id}';
+    connection.query(`select customer_id,loan_id,loan_amount*intrest_rate as principle,intrest_rate,monthly_payment*emi_on_time as amount_paid,monthly_payment,tenure-emi_on_time,emi_on_time from loan_data where customer_id='${customer_id} and loanid=${loan_id}';
     `, (error, results) => {
         if (error) {
             console.log(error);
